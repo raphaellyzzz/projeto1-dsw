@@ -1,0 +1,16 @@
+[
+  {
+    "codigo": "1",
+    "origem": "garanhuns",
+    "destino": "recife",
+    "status": "em transito",
+    "dataEnvio": "2025-06-15"
+  },
+  {
+    "codigo": "2",
+    "origem": "fortaleza",
+    "destino": "natal",
+    "status": "entregue",
+    "dataEnvio": "2025-06-10"
+  }
+]

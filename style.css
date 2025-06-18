@@ -1,0 +1,82 @@
+:root {
+    /* https://www.ranoya.com/books/public/css/corescss.php */
+
+  --cor-fundo: #f4f8f7;
+  --cor-primaria: #00008B; /* azul escuro*/
+  --cor-secundaria: #0000CD; /* azul medio*/
+  --cor-botao: #4169E1; /* royal blue*/
+  --cor-botao-secundario: #1E90FF; /* DodgerBlue*/
+  --cor-botao-hover: #00BFFF; /* DeepSkyBlue*/
+  --cor-secundario-hover: #87CEFA; /* LightSkyBlue*/
+  --cor-texto: #222;
+  --cor-branco: #fff;
+  --radius-geral: 8px;
+  --sombra-geral: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--cor-fundo);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--cor-texto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+.principal {
+  background-color: var(--cor-branco);
+  padding: 40px;
+  border-radius: var(--radius-geral);
+  box-shadow: var(--sombra-geral);
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: var(--cor-primaria);
+}
+
+p, #paragrafo-principal-index {
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+.botoes-index {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+
+.botao-index {
+  background-color: var(--cor-botao);
+  color: var(--cor-branco);
+  text-decoration: none;
+  padding: 12px 20px;
+  font-weight: bold;
+  transition: background-color 0.4s ease, transform 0.5s;
+}
+
+.botao-index:hover {
+  background-color: var(--cor-botao-hover);
+  transform: translateY(-2px);
+}
+
+.botao-secundario {
+  background-color: var(--cor-botao-secundario);
+  color: var(--cor-texto);
+}
+
+.botao-secundario:hover {
+  background-color: var(--cor-secundario-hover);
+  transform: translateY(-2px);
+}
