@@ -1,15 +1,192 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Área Administrativa</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Área Administrativa</title>
+    <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>Painel ADM...</h1>
-    
-  </main>
-</body>
+    <main class="adm-principal">
+        <section id="login-section" class="login-area">
+            <h1>Login - Área Administrativa</h1>
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="username">Usuário:</label>
+                    <input type="text" id="username" class="login-input" required />
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" class="login-input" required />
+                </div>
+                <button type="submit" class="login-button">Entrar</button>
+                <p id="login-message" class="error-mensagem"></p>
+            </form>
+        </section>
+
+        <section id="admin-panel" class="admin-panel-container hidden">
+            <h1>Painel Administrativo</h1>
+            <button id="logout-button" class="logout-button">Sair</button>
+
+            <nav class="admin-nav">
+                <ul>
+                    <li><a href="#" data-section="clientes">Clientes</a></li>
+                    <li><a href="#" data-section="encomendas">Encomendas</a></li>
+                    <li><a href="#" data-section="rotas">Rotas de Entrega</a></li>
+                    <li><a href="#" data-section="entregas">Entregas</a></li>
+                    <li><a href="#" data-section="centros">Centros de Distribuição</a></li>
+                </ul>
+            </nav>
+
+            <div id="content-area" class="content-area">
+                <div id="clientes-section" class="admin-section hidden">
+                    <h2>Clientes</h2>
+                    <h3>Cadastrar Cliente</h3>
+                    <form id="cliente-form" class="admin-form">
+                        <div class="form-group">
+                            <label for="cliente-nome">Nome Completo:</label>
+                            <input type="text" id="cliente-nome" class="admin-input" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="cliente-cpf-cnpj">CPF/CNPJ:</label>
+                            <input type="text" id="cliente-cpf-cnpj" class="admin-input" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="cliente-email">E-mail:</label>
+                            <input type="email" id="cliente-email" class="admin-input" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="cliente-endereco">Endereço:</label>
+                            <input type="text" id="cliente-endereco" class="admin-input" required />
+                        </div>
+                        <button type="submit" class="admin-button">Salvar Cliente</button>
+                    </form>
+                    <h3>Listagem de Clientes</h3>
+                    <div class="filters-container">
+                        <input type="text" id="filter-cliente-nome" class="admin-input-filter" placeholder="Filtrar por Nome" />
+                        <input type="text" id="filter-cliente-cpf-cnpj" class="admin-input-filter" placeholder="Filtrar por CPF/CNPJ" />
+                    </div>
+                    <div id="cliente-list" class="admin-list"></div>
+                </div>
+
+                <div id="encomendas-section" class="admin-section hidden">
+                    <h2>Encomendas</h2>
+                    <h3>Cadastrar Encomenda</h3>
+                    <form id="encomenda-form" class="admin-form">
+                        <div class="form-group">
+                            <label for="encomenda-peso">Peso (kg):</label>
+                            <input type="number" id="encomenda-peso" class="admin-input" step="0.01" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="encomenda-tipo">Tipo:</label>
+                            <select id="encomenda-tipo" class="admin-input" required>
+                                <option value="">Selecione</option>
+                                <option value="documento">Documento</option>
+                                <option value="caixa">Caixa</option>
+                                <option value="palete">Palete</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="encomenda-descricao">Descrição:</label>
+                            <textarea id="encomenda-descricao" class="admin-input"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="encomenda-endereco">Endereço de Entrega:</label>
+                            <input type="text" id="encomenda-endereco" class="admin-input" required />
+                        </div>
+                        <button type="submit" class="admin-button">Salvar Encomenda</button>
+                    </form>
+                    <h3>Listagem de Encomendas</h3>
+                    <div class="filters-container">
+                        <select id="filter-encomenda-tipo" class="admin-input-filter">
+                            <option value="">Todos os Tipos</option>
+                            <option value="documento">Documento</option>
+                            <option value="caixa">Caixa</option>
+                            <option value="palete">Palete</option>
+                        </select>
+                        <input type="number" id="filter-encomenda-peso" class="admin-input-filter" placeholder="Filtrar por Peso (kg)" step="0.01" />
+                    </div>
+                    <div id="encomenda-list" class="admin-list"></div>
+                </div>
+
+                <div id="rotas-section" class="admin-section hidden">
+                    <h2>Rotas de Entrega</h2>
+                    <h3>Cadastrar Rota</h3>
+                    <form id="rota-form" class="admin-form">
+                        <div class="form-group">
+                            <label for="rota-origem">Origem:</label>
+                            <input type="text" id="rota-origem" class="admin-input" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="rota-destino">Destino:</label>
+                            <input type="text" id="rota-destino" class="admin-input" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="rota-intermediarios">Centros Intermediários (opcional, separados por vírgula):</label>
+                            <input type="text" id="rota-intermediarios" class="admin-input" />
+                        </div>
+                        <div class="form-group">
+                            <label for="rota-distancia">Distância (km):</label>
+                            <input type="number" id="rota-distancia" class="admin-input" step="0.1" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="rota-tempo">Tempo Estimado (h):</label>
+                            <input type="number" id="rota-tempo" class="admin-input" step="0.1" required />
+                        </div>
+                        <button type="submit" class="admin-button">Salvar Rota</button>
+                    </form>
+                    <h3>Listagem de Rotas</h3>
+                    <div class="filters-container">
+                        <input type="text" id="filter-rota-origem" class="admin-input-filter" placeholder="Filtrar por Origem" />
+                        <input type="text" id="filter-rota-destino" class="admin-input-filter" placeholder="Filtrar por Destino" />
+                    </div>
+                    <div id="rota-list" class="admin-list"></div>
+                </div>
+
+                <div id="entregas-section" class="admin-section hidden">
+                    <h2>Entregas</h2>
+                    <h3>Criar Entrega</h3>
+                    <form id="entrega-form" class="admin-form">
+                        <div class="form-group">
+                            <label for="entrega-cliente">Cliente:</label>
+                            <select id="entrega-cliente" class="admin-input" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entrega-encomenda">Encomenda:</label>
+                            <select id="entrega-encomenda" class="admin-input" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entrega-rota">Rota:</label>
+                            <select id="entrega-rota" class="admin-input" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entrega-data-estimada">Data Estimada:</label>
+                            <input type="date" id="entrega-data-estimada" class="admin-input" required />
+                        </div>
+                        <button type="submit" class="admin-button">Criar Entrega</button>
+                    </form>
+                    <h3>Listagem de Entregas</h3>
+                    <div class="filters-container">
+                        <select id="filter-entrega-cliente" class="admin-input-filter"></select>
+                        <select id="filter-entrega-rota" class="admin-input-filter"></select>
+                        <input type="date" id="filter-entrega-data" class="admin-input-filter" />
+                        <select id="filter-entrega-status" class="admin-input-filter">
+                            <option value="">Todos os Status</option>
+                            <option value="em_preparo">Em Preparo</option>
+                            <option value="a_caminho">A Caminho</option>
+                            <option value="entregue">Entregue</option>
+                        </select>
+                    </div>
+                    <div id="entrega-list" class="admin-list"></div>
+                </div>
+
+                <div id="centros-section" class="admin-section hidden">
+                    <h2>Centros de Distribuição</h2>
+                    <h3>Listagem de Centros</h3>
+                    <div id="centro-list" class="admin-list"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <script src="../scripts/script_admin.js"></script> </body>
 </html>
