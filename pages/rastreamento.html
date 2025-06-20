@@ -3,22 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <title>Página de Rastreamento</title>
-  <link rel="stylesheet" href="" />
+  <link rel="stylesheet" href="../style.css" />
   <link rel="icon" href="">
 </head>
 <body>
-  <h1>Suas Encomendas:</h1>
+ 
+  <main class="rastreamento-principal">
+    <a href="admin.html" class="botao-ir-adm">Ir para área administrativa</a> 
+    <br> <br>
+    <h1 id="titulo-rastreamento">Suas Encomendas:</h1>
 
-  <input type="text" id="buscar" placeholder="Buscar por código ou destino..." />
-  <select id="filtro-status">
-    <option value="">Todos os status</option>
-    <option value="Em trânsito">Em trânsito</option>
-    <option value="Entregue">Entregue</option>
-  </select>
+    <div class="filtros-rastreamento">
+      <input type="text" id="buscar" class="input-rastreamento" placeholder="Buscar por código..." />
+      <input type="text" id="buscar-cliente" class="input-rastreamento" placeholder="Buscar por cliente..." />
+      <select id="filtro-status" class="select-rastreamento">
+        <option value="">Todos os status</option>
+        <option value="em transito">Em trânsito</option>
+        <option value="entregue">Entregue</option>
+      </select>
+    </div>
 
-  <div id="lista-encomendas"></div>
-
-  <!-- LEMBRAR DE ORGANIZAR O CSS!!!!!!!!!!!! -->
+    <div id="lista-encomendas" class="lista-encomendas"></div>
+  </main>
 
   <script src="../scripts/script_encomendas.js"></script>
 </body>
