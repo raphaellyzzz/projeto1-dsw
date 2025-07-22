@@ -719,3 +719,8 @@ p, #paragrafo-principal-index {
     padding-right: 15px; 
     padding-bottom: 20px; 
 }
+
+.p-admin-sem-espaco {
+  margin: 2px 0;
+  line-height: 1.4;
+}
