@@ -1,69 +1,127 @@
-let encomendas = [];
+const { createApp } = Vue;
+const API_URL = 'http://200.133.17.234:5000';
 
-async function carregarEncomendas() {
-  const res = await fetch('../dados/encomendas.json');
-  encomendas = await res.json();
-  mostrarEncomendas(encomendas);
-}
+createApp({
+  data() {
+    return {
+      entregas: [],
+      clientes: [],
+      rotas: [],
+      filtroCodigo: '',
+      filtroCliente: '',
+      filtroStatus: '',
+      carregando: true,
+    };
+  },
+  computed: {
+    entregasFiltradas() {
+      const filtroCodigoLower = this.filtroCodigo.toLowerCase();
+      const filtroClienteLower = this.filtroCliente.toLowerCase();
+      const filtroStatusLower = this.filtroStatus.toLowerCase();
 
-async function mostrarEncomendas(lista) {
-  const container = document.getElementById('lista-encomendas');
-  container.innerHTML = '';
+      return this.entregas.filter(entrega => {
+        const condCodigo = !filtroCodigoLower || (entrega.codigo_rastreamento || '').toLowerCase().includes(filtroCodigoLower);
+        
+        const clienteNome = this.obterNomeCliente(entrega.clienteId || entrega.cliente).toLowerCase();
+        const condCliente = !filtroClienteLower || clienteNome.includes(filtroClienteLower);
 
-  const res = await fetch('../dados/historico.json');
-  const historico = await res.json();
+        const condStatus = !filtroStatusLower || (entrega.status || '').toLowerCase() === filtroStatusLower;
 
-  lista.forEach(e => {
-    const div = document.createElement('div');
-    div.className = 'encomenda';
+        return condCodigo && condCliente && condStatus;
+      });
+    },
+  },
+  methods: {
+    async carregarClientes() {
+      try {
+        const res = await fetch(`${API_URL}/clientes`);
+        this.clientes = await res.json();
+      } catch (e) {
+        console.error('Erro ao carregar clientes:', e);
+      }
+    },
+    async carregarRotas() {
+      try {
+        const res = await fetch(`${API_URL}/rotas`);
+        this.rotas = await res.json();
+      } catch (e) {
+        console.error('Erro ao carregar rotas:', e);
+      }
+    },
+    async carregarEntregas() {
+      this.carregando = true;
+      try {
+        const res = await fetch(`${API_URL}/entregas`);
+        let entregasData = await res.json();
+        
+        const entregasComHistorico = await Promise.all(entregasData.map(async entrega => {
+          try {
+            const historicoRes = await fetch(`${API_URL}/entregas/${entrega.id}/historico`);
+            entrega.historico = await historicoRes.json();
+          } catch (e) {
+            console.warn(`Erro ao carregar histórico para entrega ${entrega.id}:`, e);
+            entrega.historico = []; 
+          }
+          return entrega;
+        }));
 
-    const historicoHtml = historico[e.codigo]
-      ? 
-      `<div class="historico">
-        <br>
-        <h3 id="h3-rastreamento">Histórico:</h3>
-        <ul>
-          ${
-              historico[e.codigo].map(h => `<li class="lista-rastreamento"> <strong> Na data: </strong> ${h.data} - <strong> Status: </strong> ${h.status}</li>`).join('')
-            }
-        </ul>
-      </div>`
-      : '<div class="historico"><em>Sem histórico disponível</em></div>';
+        this.entregas = entregasComHistorico;
+      } catch (e) {
+        console.error('Erro ao carregar entregas:', e);
+      } finally {
+        this.carregando = false;
+      }
+    },
+    obterNomeCliente(id) {
+      const cliente = this.clientes.find(c => String(c.id) === String(id));
+      return cliente ? cliente.nome : `Cliente ${id}`;
+    },
+    obterOrigemRota(id) {
+      const rota = this.rotas.find(r => String(r.id) === String(id));
+      return rota ? rota.origem : 'N/A';
+    },
+    obterDestinoRota(id) {
+      const rota = this.rotas.find(r => String(r.id) === String(id));
+      return rota ? rota.destino : 'N/A';
+    },
+    traduzirStatus(status) {
+      const mapa = {
+        em_transito: 'Em trânsito',
+        entregue: 'Entregue',
+        em_preparo: 'Em preparo',
+        a_caminho: 'A caminho',
+        pendente: 'Pendente',
+        extraviada: 'Extraviada',
+        atrasada: 'Atrasada',
+      };
+      return mapa[status] || status || 'Status desconhecido';
+    },
+    formatarData(isoData) {
+      if (!isoData) return 'N/A';
+      const data = new Date(isoData);
+      if (isNaN(data)) return isoData;
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const ano = data.getFullYear();
+      return `${dia}/${mes}/${ano}`;
+    },
+    formatarDataHora(isoData) {
+      if (!isoData) return 'N/A';
+      const data = new Date(isoData);
+      if (isNaN(data)) return isoData;
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const ano = data.getFullYear();
+      const horas = String(data.getHours()).padStart(2, '0');
+      const minutos = String(data.getMinutes()).padStart(2, '0');
+      return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+    },
+  },
+  async mounted() {
+    await this.carregarClientes();
+    await this.carregarRotas();
+    await this.carregarEntregas();
+  },
+}).mount('#app-rastreamento');
 
-    div.innerHTML = `
-      <strong>Código:</strong> ${e.codigo} <br />
-      <strong>Cliente:</strong> ${e.cliente} <br />
-      <strong>Origem:</strong> ${e.origem} → <strong>Destino:</strong> ${e.destino}<br />
-      <strong>Status:</strong> ${e.status} <br />
-      <strong>Data de envio:</strong> ${e.dataEnvio}
-      ${historicoHtml}
-      <hr/>
-    `;
-
-    container.appendChild(div);
-  });
-}
-
-
-function aplicarFiltros() {
-  const busca = document.getElementById('buscar').value.toLowerCase();
-  const cliente = document.getElementById('buscar-cliente').value.toLowerCase();
-  const status = document.getElementById('filtro-status').value;
-
-  const filtradas = encomendas.filter(e => {
-    const condBusca = e.codigo.toLowerCase().includes(busca) || e.destino.toLowerCase().includes(busca);
-    const condCliente = e.cliente.toLowerCase().includes(cliente);
-    const condStatus = !status || e.status === status;
-    return condBusca && condCliente && condStatus;
-  });
-
-  mostrarEncomendas(filtradas);
-}
-
-document.getElementById('buscar').addEventListener('input', aplicarFiltros);
-document.getElementById('buscar-cliente').addEventListener('input', aplicarFiltros);
-document.getElementById('filtro-status').addEventListener('change', aplicarFiltros);
-
-carregarEncomendas();
-
-// TENTAR APLICAR COM VUE.JS
+//aplicar com resolução de erros
