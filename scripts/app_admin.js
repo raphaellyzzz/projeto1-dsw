@@ -31,10 +31,13 @@ createApp({
         tempo: ''
       },
       novaEntregaForm: {
-        cliente: '',
-        encomenda: '',
-        rota: '',
-        data: ''
+        clienteId: null, // Alterado para ID numérico
+        encomendaId: null, // Alterado para ID numérico
+        rotaId: '', // Mantido como string de ID
+        data_estimada: '', // Novo campo
+        status: 'em_preparo', // Novo campo com valor padrão
+        codigo_rastreamento: '', // Novo campo
+        historico: [] // Novo campo para histórico
       },
       filtroStatusEncomenda: ''
     };
@@ -48,18 +51,16 @@ createApp({
     },
     encomendasFiltradasC() {
       const filtroCodigo = this.filtroCodigoEncomenda.toLowerCase();
+      const filtroStatus = this.filtroStatusEncomenda.toLowerCase();
+
       return this.listaEncomendas.filter(e => {
-        if (!filtroCodigo) return true; 
-
-        const codigo = (e.codigo || '').toLowerCase();
-        const descricao = (e.descricao || '').toLowerCase();
-        const conteudo = (e.conteudo || '').toLowerCase();
-
-        return (
-          codigo.includes(filtroCodigo) ||
-          descricao.includes(filtroCodigo) ||
-          conteudo.includes(filtroCodigo)
+        const condCodigo = !filtroCodigo || (
+          (e.codigo || '').toLowerCase().includes(filtroCodigo) ||
+          (e.descricao || '').toLowerCase().includes(filtroCodigo) ||
+          (e.conteudo || '').toLowerCase().includes(filtroCodigo)
         );
+        const condStatus = !filtroStatus || (e.status || '').toLowerCase().includes(filtroStatus);
+        return condCodigo && condStatus;
       });
     }
   },
@@ -70,7 +71,8 @@ createApp({
         entregue: 'Entregue',
         em_preparo: 'Em preparo',
         a_caminho: 'A caminho',
-        // ...
+        pendente: 'Pendente',
+        extraviada: 'Extraviada'
       };
       return mapa[status] || status || 'Status desconhecido';
     },
@@ -108,6 +110,7 @@ createApp({
         this.carregarEncomendas();
         this.carregarRotas();
         this.carregarEntregas();
+        this.carregarCentros(); // Adicionado para carregar centros no login
       } else {
         this.erroLogin = 'Usuário ou senha estão inválidos.';
       }
@@ -120,6 +123,7 @@ createApp({
       this.listaEncomendas = [];
       this.listaRotas = [];
       this.listaEntregas = [];
+      this.listaCentros = [];
     },
 
     async carregarClientes() {
@@ -190,7 +194,19 @@ createApp({
     },
 
     async adicionarEntrega() {
-      const payload = { ...this.novaEntregaForm };
+      const payload = {
+        clienteId: this.novaEntregaForm.clienteId,
+        encomendaId: this.novaEntregaForm.encomendaId,
+        rotaId: this.novaEntregaForm.rotaId,
+        codigo_rastreamento: this.novaEntregaForm.codigo_rastreamento,
+        data_estimada: this.novaEntregaForm.data_estimada,
+        status: this.novaEntregaForm.status,
+        historico: [{
+          data: new Date().toISOString(),
+          status: this.novaEntregaForm.status,
+          local: 'Entrega criada'
+        }]
+      };
       try {
         const res = await fetch(`${API_URL}/entregas`, {
           method: 'POST',
@@ -198,7 +214,15 @@ createApp({
           body: JSON.stringify(payload)
         });
         if (res.ok) {
-          this.novaEntregaForm = { cliente: '', encomenda: '', rota: '', data: '' };
+          this.novaEntregaForm = {
+            clienteId: null,
+            encomendaId: null,
+            rotaId: '',
+            data_estimada: '',
+            status: 'em_preparo',
+            codigo_rastreamento: '',
+            historico: []
+          };
           await this.carregarEntregas(); 
         } else {
           console.error('Erro ao adicionar entrega:', res.statusText);
@@ -250,6 +274,8 @@ createApp({
       if (res.ok) {
         this.novaRotaForm = { origem: '', destino: '', centros: '', distancia: '', tempo: '' };
         this.carregarRotas();
+      } else {
+        console.error('Erro ao adicionar rota:', res.statusText);
       }
     },
   
