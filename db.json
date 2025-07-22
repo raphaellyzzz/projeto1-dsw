@@ -1,0 +1,89 @@
+{
+  "clientes": [
+    {
+      "id": 1,
+      "nome": "Empresa de Tecnologia LTDA",
+      "cpfCnpj": "12345678000190",
+      "email": "contato@tecnologia.com",
+      "endereco": "Rua da Inovação, 123, Recife/PE"
+    },
+    {
+      "id": 2,
+      "nome": "Maria Silva",
+      "cpfCnpj": "12345678901",
+      "email": "maria.silva@email.com",
+      "endereco": "Avenida Boa Viagem, 456, Recife/PE"
+    }
+  ],
+  "encomendas": [
+    {
+      "id": 101,
+      "peso": 5.5,
+      "tipo": "caixa",
+      "descricao": "Peças de computador",
+      "endereco_entrega": "Rua do Futuro, 789, Olinda/PE"
+    },
+    {
+      "id": 102,
+      "peso": 0.2,
+      "tipo": "documento",
+      "descricao": "Contrato confidencial",
+      "endereco_entrega": "Rua da Aurora, 101, Recife/PE"
+    }
+  ],
+  "centros": [
+    {
+      "id": "cd-rec",
+      "nome": "Centro de Distribuição Recife",
+      "endereco": "BR-101, Km 80, Recife/PE",
+      "cidade": "Recife"
+    },
+    {
+      "id": "cd-cbt",
+      "nome": "Centro de Distribuição Caruaru",
+      "endereco": "BR-232, Km 130, Caruaru/PE",
+      "cidade": "Caruaru"
+    }
+  ],
+  "rotas": [
+    {
+      "id": "rota-01",
+      "origem": "Recife",
+      "destino": "Caruaru",
+      "distancia_km": 135,
+      "tempo_estimado_h": 2,
+      "centros_intermediarios": []
+    },
+    {
+      "id": "rota-02",
+      "origem": "Recife",
+      "destino": "João Pessoa",
+      "distancia_km": 120,
+      "tempo_estimado_h": 1.5,
+      "centros_intermediarios": []
+    }
+  ],
+  "entregas": [
+    {
+      "id": "ent-001",
+      "codigo_rastreamento": "BR123456789PE",
+      "clienteId": 1,
+      "encomendaId": 101,
+      "rotaId": "rota-01",
+      "data_estimada": "2025-07-20",
+      "status": "a_caminho",
+      "historico": [
+        {
+          "data": "2025-07-11T09:00:00Z",
+          "status": "em_preparo",
+          "local": "CD Recife"
+        },
+        {
+          "data": "2025-07-11T14:30:00Z",
+          "status": "a_caminho",
+          "local": "Em trânsito para Caruaru"
+        }
+      ]
+    }
+  ]
+}
