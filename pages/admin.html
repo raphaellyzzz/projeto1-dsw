@@ -7,186 +7,139 @@
     <link rel="stylesheet" href="../style.css" />
 </head>
 <body>
-    <main class="adm-principal">
-        <section id="login-section" class="login-area">
+    <main class="principal-adm">
+        <section id="secao-login" class="area-login" v-show="!logado">
             <h1>Login - Área Administrativa</h1>
-            <form id="login-form" class="login-form">
-                <div class="form-group">
-                    <label for="username">Usuário:</label>
-                    <input type="text" id="username" class="login-input" required />
+            <form @submit.prevent="realizarLogin" class="formulario-login">
+                <div class="grupo-formulario">
+                    <label for="nomeUsuario">Usuário:</label>
+                    <input type="text" id="nomeUsuario" class="entrada-login" v-model="nomeUsuario" required />
                 </div>
-                <div class="form-group">
-                    <label for="password">Senha:</label>
-                    <input type="password" id="password" class="login-input" required />
+                <div class="grupo-formulario">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" class="entrada-login" v-model="senha" required />
                 </div>
-                <button type="submit" class="login-button">Entrar</button>
-                <p id="login-message" class="error-mensagem"></p>
+                <button type="submit" class="botao-login">Entrar</button>
+                <p id="mensagem-login" class="mensagem-erro" v-if="erroLogin">{{ erroLogin }}</p>
             </form>
         </section>
 
-        <section id="admin-panel" class="admin-panel-container hidden">
+        <section id="painel-admin" class="container-painel-admin" v-cloak v-show="logado">
             <h1>Painel Administrativo</h1>
-            <button id="logout-button" class="logout-button">Sair</button>
+            <button id="botao-sair" class="botao-sair" @click="realizarLogout">Sair</button>
 
-            <nav class="admin-nav">
+            <nav class="navegacao-admin">
                 <ul>
-                    <li><a href="#" data-section="clientes">Clientes</a></li>
-                    <li><a href="#" data-section="encomendas">Encomendas</a></li>
-                    <li><a href="#" data-section="rotas">Rotas de Entrega</a></li>
-                    <li><a href="#" data-section="entregas">Entregas</a></li>
-                    <li><a href="#" data-section="centros">Centros de Distribuição</a></li>
+                    <li><a href="#" :class="{ active: secaoAtual === 'clientes' }" @click="trocarSecao('clientes')">Clientes</a></li>
+                    <li><a href="#" :class="{ active: secaoAtual === 'encomendas' }" @click="trocarSecao('encomendas')">Encomendas</a></li>
+                    <li><a href="#" :class="{ active: secaoAtual === 'rotas' }" @click="trocarSecao('rotas')">Rotas de Entrega</a></li>
+                    <li><a href="#" :class="{ active: secaoAtual === 'entregas' }" @click="trocarSecao('entregas')">Entregas</a></li>
+                    <li><a href="#" :class="{ active: secaoAtual === 'centros' }" @click="trocarSecao('centros')">Centros de Distribuição</a></li>
                 </ul>
             </nav>
 
-            <div id="content-area" class="content-area">
-                <div id="clientes-section" class="admin-section hidden">
+            <div class="area-conteudo-admin">
+                <div id="secao-clientes" class="secao-admin" v-show="secaoAtual === 'clientes'" v-cloak>
                     <h2>Clientes</h2>
                     <h3>Cadastrar Cliente</h3>
-                    <form id="cliente-form" class="admin-form">
-                        <div class="form-group">
-                            <label for="cliente-nome">Nome Completo:</label>
-                            <input type="text" id="cliente-nome" class="admin-input" required />
+                    <form @submit.prevent="adicionarCliente" class="formulario-admin">
+                        <div class="grupo-formulario">
+                        <label>Nome:</label>
+                        <input v-model="novoClienteForm.nome" class="entrada-admin" required />
                         </div>
-                        <div class="form-group">
-                            <label for="cliente-cpf-cnpj">CPF/CNPJ:</label>
-                            <input type="text" id="cliente-cpf-cnpj" class="admin-input" required />
+                        <div class="grupo-formulario">
+                        <label>CPF/CNPJ:</label>
+                        <input v-model="novoClienteForm.cpfCnpj" class="entrada-admin" required />
                         </div>
-                        <div class="form-group">
-                            <label for="cliente-email">E-mail:</label>
-                            <input type="email" id="cliente-email" class="admin-input" required />
+                        <div class="grupo-formulario">
+                        <label>Email:</label>
+                        <input v-model="novoClienteForm.email" class="entrada-admin" required />
                         </div>
-                        <div class="form-group">
-                            <label for="cliente-endereco">Endereço:</label>
-                            <input type="text" id="cliente-endereco" class="admin-input" required />
+                        <div class="grupo-formulario">
+                        <label>Endereço:</label>
+                        <input v-model="novoClienteForm.endereco" class="entrada-admin" required />
                         </div>
-                        <button type="submit" class="admin-button">Salvar Cliente</button>
+                        <button class="botao-admin">Salvar Cliente</button>
                     </form>
+
                     <h3>Listagem de Clientes</h3>
-                    <div class="filters-container">
-                        <input type="text" id="filter-cliente-nome" class="admin-input-filter" placeholder="Filtrar por Nome" />
-                        <input type="text" id="filter-cliente-cpf-cnpj" class="admin-input-filter" placeholder="Filtrar por CPF/CNPJ" />
+                    <div class="container-filtros">
+                        <input v-model="filtroNomeCliente" placeholder="Filtrar por Nome" class="entrada-filtro-admin" />
+                        <input v-model="filtroCpfCnpjCliente" placeholder="Filtrar por CPF/CNPJ" class="entrada-filtro-admin" />
                     </div>
-                    <div id="cliente-list" class="admin-list"></div>
+
+                    <div class="lista-admin">
+                        <div v-for="cliente in clientesFiltradosC" :key="cliente.cpfCnpj" class="item-lista">
+                            <strong>Nome:</strong> {{ cliente.nome }}<br>
+                            <strong>CPF/CNPJ:</strong> {{ cliente.cpfCnpj }}<br>
+                            <strong>Email:</strong> {{ cliente.email }}<br>
+                            <strong>Endereço:</strong> {{ cliente.endereco }}<br><hr>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="encomendas-section" class="admin-section hidden">
+                <div id="secao-encomendas" class="secao-admin" v-show="secaoAtual === 'encomendas'" v-cloak>
                     <h2>Encomendas</h2>
                     <h3>Cadastrar Encomenda</h3>
-                    <form id="encomenda-form" class="admin-form">
-                        <div class="form-group">
-                            <label for="encomenda-peso">Peso (kg):</label>
-                            <input type="number" id="encomenda-peso" class="admin-input" step="0.01" required />
+                    <form @submit.prevent="adicionarEncomenda" class="formulario-admin">
+                        <div class="grupo-formulario">
+                            <label>Código de Rastreamento:</label>
+                            <input v-model="novaEncomendaForm.codigo" class="entrada-admin" required />
                         </div>
-                        <div class="form-group">
-                            <label for="encomenda-tipo">Tipo:</label>
-                            <select id="encomenda-tipo" class="admin-input" required>
-                                <option value="">Selecione</option>
-                                <option value="documento">Documento</option>
-                                <option value="caixa">Caixa</option>
-                                <option value="palete">Palete</option>
+                        <div class="grupo-formulario">
+                            <label>Conteúdo:</label>
+                            <input v-model="novaEncomendaForm.conteudo" class="entrada-admin" required />
+                        </div>
+                        <div class="grupo-formulario">
+                            <label>Status:</label>
+                            <select v-model="novaEncomendaForm.status" class="selecao-admin" required>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Em Trânsito">Em Trânsito</option>
+                                <option value="Entregue">Entregue</option>
+                                <option value="Extraviada">Extraviada</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="encomenda-descricao">Descrição:</label>
-                            <textarea id="encomenda-descricao" class="admin-input"></textarea>
+                        <div class="grupo-formulario">
+                            <label>Data de Postagem:</label>
+                            <input type="date" v-model="novaEncomendaForm.dataPostagem" class="entrada-admin" required />
                         </div>
-                        <div class="form-group">
-                            <label for="encomenda-endereco">Endereço de Entrega:</label>
-                            <input type="text" id="encomenda-endereco" class="admin-input" required />
+                        <div class="grupo-formulario">
+                            <label>Previsão de Entrega:</label>
+                            <input type="date" v-model="novaEncomendaForm.previsaoEntrega" class="entrada-admin" required />
                         </div>
-                        <button type="submit" class="admin-button">Salvar Encomenda</button>
+                        <div class="grupo-formulario">
+                            <label>Remetente (CPF/CNPJ):</label>
+                            <input v-model="novaEncomendaForm.remetenteCpfCnpj" class="entrada-admin" required />
+                        </div>
+                        <div class="grupo-formulario">
+                            <label>Destinatário (CPF/CNPJ):</label>
+                            <input v-model="novaEncomendaForm.destinatarioCpfCnpj" class="entrada-admin" required />
+                        </div>
+                        <button class="botao-admin">Salvar Encomenda</button>
                     </form>
+
                     <h3>Listagem de Encomendas</h3>
-                    <div class="filters-container">
-                        <select id="filter-encomenda-tipo" class="admin-input-filter">
-                            <option value="">Todos os Tipos</option>
-                            <option value="documento">Documento</option>
-                            <option value="caixa">Caixa</option>
-                            <option value="palete">Palete</option>
-                        </select>
-                        <input type="number" id="filter-encomenda-peso" class="admin-input-filter" placeholder="Filtrar por Peso (kg)" step="0.01" />
+                    <div class="container-filtros">
+                        <input v-model="filtroCodigoEncomenda" placeholder="Filtrar por Código" class="entrada-filtro-admin" />
+                        <input v-model="filtroStatusEncomenda" placeholder="Filtrar por Status" class="entrada-filtro-admin" />
                     </div>
-                    <div id="encomenda-list" class="admin-list"></div>
-                </div>
 
-                <div id="rotas-section" class="admin-section hidden">
-                    <h2>Rotas de Entrega</h2>
-                    <h3>Cadastrar Rota</h3>
-                    <form id="rota-form" class="admin-form">
-                        <div class="form-group">
-                            <label for="rota-origem">Origem:</label>
-                            <input type="text" id="rota-origem" class="admin-input" required />
+                    <div class="lista-admin">
+                        <div v-for="encomenda in encomendasFiltradasC" :key="encomenda.codigo" class="item-lista">
+                            <strong>Código:</strong> {{ encomenda.codigo }}<br>
+                            <strong>Conteúdo:</strong> {{ encomenda.conteudo }}<br>
+                            <strong>Status:</strong> {{ encomenda.status }}<br>
+                            <strong>Data de Postagem:</strong> {{ encomenda.dataPostagem }}<br>
+                            <strong>Previsão de Entrega:</strong> {{ encomenda.previsaoEntrega }}<br>
+                            <strong>Remetente:</strong> {{ encomenda.remetenteCpfCnpj }}<br>
+                            <strong>Destinatário:</strong> {{ encomenda.destinatarioCpfCnpj }}<br>
                         </div>
-                        <div class="form-group">
-                            <label for="rota-destino">Destino:</label>
-                            <input type="text" id="rota-destino" class="admin-input" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="rota-intermediarios">Centros Intermediários (opcional, separados por vírgula):</label>
-                            <input type="text" id="rota-intermediarios" class="admin-input" />
-                        </div>
-                        <div class="form-group">
-                            <label for="rota-distancia">Distância (km):</label>
-                            <input type="number" id="rota-distancia" class="admin-input" step="0.1" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="rota-tempo">Tempo Estimado (h):</label>
-                            <input type="number" id="rota-tempo" class="admin-input" step="0.1" required />
-                        </div>
-                        <button type="submit" class="admin-button">Salvar Rota</button>
-                    </form>
-                    <h3>Listagem de Rotas</h3>
-                    <div class="filters-container">
-                        <input type="text" id="filter-rota-origem" class="admin-input-filter" placeholder="Filtrar por Origem" />
-                        <input type="text" id="filter-rota-destino" class="admin-input-filter" placeholder="Filtrar por Destino" />
                     </div>
-                    <div id="rota-list" class="admin-list"></div>
-                </div>
-
-                <div id="entregas-section" class="admin-section hidden">
-                    <h2>Entregas</h2>
-                    <h3>Criar Entrega</h3>
-                    <form id="entrega-form" class="admin-form">
-                        <div class="form-group">
-                            <label for="entrega-cliente">Cliente:</label>
-                            <select id="entrega-cliente" class="admin-input" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="entrega-encomenda">Encomenda:</label>
-                            <select id="entrega-encomenda" class="admin-input" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="entrega-rota">Rota:</label>
-                            <select id="entrega-rota" class="admin-input" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="entrega-data-estimada">Data Estimada:</label>
-                            <input type="date" id="entrega-data-estimada" class="admin-input" required />
-                        </div>
-                        <button type="submit" class="admin-button">Criar Entrega</button>
-                    </form>
-                    <h3>Listagem de Entregas</h3>
-                    <div class="filters-container">
-                        <select id="filter-entrega-cliente" class="admin-input-filter"></select>
-                        <select id="filter-entrega-rota" class="admin-input-filter"></select>
-                        <input type="date" id="filter-entrega-data" class="admin-input-filter" />
-                        <select id="filter-entrega-status" class="admin-input-filter">
-                            <option value="">Todos os Status</option>
-                            <option value="em_preparo">Em Preparo</option>
-                            <option value="a_caminho">A Caminho</option>
-                            <option value="entregue">Entregue</option>
-                        </select>
-                    </div>
-                    <div id="entrega-list" class="admin-list"></div>
-                </div>
-
-                <div id="centros-section" class="admin-section hidden">
-                    <h2>Centros de Distribuição</h2>
-                    <h3>Listagem de Centros</h3>
-                    <div id="centro-list" class="admin-list"></div>
                 </div>
             </div>
-        </section>
+            </section>
     </main>
-    <script src="../scripts/script_admin.js"></script> </body>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="../scripts/app_admin.js"></script>
+</body>
 </html>
