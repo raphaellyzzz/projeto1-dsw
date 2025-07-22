@@ -109,12 +109,18 @@
                     <input type="date" v-model="novaEncomendaForm.previsaoEntrega" class="entrada-admin" required />
                 </div>
                 <div class="grupo-formulario">
-                    <label>Remetente (CPF/CNPJ):</label>
-                    <input v-model="novaEncomendaForm.remetenteCpfCnpj" class="entrada-admin" required />
+                    <label>Remetente (Cliente):</label>
+                    <select v-model="novaEncomendaForm.remetenteCpfCnpj" class="selecao-admin" required>
+                        <option value="">Selecione um cliente</option>
+                        <option v-for="cliente in listaClientes" :key="cliente.id" :value="cliente.cpfCnpj">{{ cliente.nome }} ({{ cliente.cpfCnpj }})</option>
+                    </select>
                 </div>
                 <div class="grupo-formulario">
-                    <label>Destinatário (CPF/CNPJ):</label>
-                    <input v-model="novaEncomendaForm.destinatarioCpfCnpj" class="entrada-admin" required />
+                    <label>Destinatário (Cliente):</label>
+                    <select v-model="novaEncomendaForm.destinatarioCpfCnpj" class="selecao-admin" required>
+                        <option value="">Selecione um cliente</option>
+                        <option v-for="cliente in listaClientes" :key="cliente.id" :value="cliente.cpfCnpj">{{ cliente.nome }} ({{ cliente.cpfCnpj }})</option>
+                    </select>
                 </div>
                 <button class="botao-admin">Salvar Encomenda</button>
                 </form>
@@ -200,22 +206,45 @@
 
             <div id="secao-entregas" class="secao-admin" v-show="secaoAtual === 'entregas'" v-cloak>
                 <h2>Entregas</h2>
+                <h3>Criar Entrega</h3>
                 <form @submit.prevent="adicionarEntrega" class="formulario-admin">
                 <div class="grupo-formulario">
-                    <label>Cliente (CPF/CNPJ):</label>
-                    <input v-model="novaEntregaForm.cliente" class="entrada-admin" required />
+                    <label>Cliente:</label>
+                    <select v-model.number="novaEntregaForm.clienteId" class="selecao-admin" required>
+                        <option value="null" disabled>Selecione um cliente</option>
+                        <option v-for="cliente in listaClientes" :key="cliente.id" :value="cliente.id">{{ cliente.nome }} (ID: {{ cliente.id }})</option>
+                    </select>
                 </div>
                 <div class="grupo-formulario">
-                    <label>Encomenda (Código):</label>
-                    <input v-model="novaEntregaForm.encomenda" class="entrada-admin" required />
+                    <label>Encomenda:</label>
+                    <select v-model.number="novaEntregaForm.encomendaId" class="selecao-admin" required>
+                        <option value="null" disabled>Selecione uma encomenda</option>
+                        <option v-for="encomenda in listaEncomendas" :key="encomenda.id" :value="encomenda.id">{{ encomenda.codigo || encomenda.descricao }} (ID: {{ encomenda.id }})</option>
+                    </select>
                 </div>
                 <div class="grupo-formulario">
-                    <label>Rota (ID):</label>
-                    <input v-model="novaEntregaForm.rota" class="entrada-admin" required />
+                    <label>Rota:</label>
+                    <select v-model="novaEntregaForm.rotaId" class="selecao-admin" required>
+                        <option value="" disabled>Selecione uma rota</option>
+                        <option v-for="rota in listaRotas" :key="rota.id" :value="rota.id">{{ rota.origem }} → {{ rota.destino }} (ID: {{ rota.id }})</option>
+                    </select>
+                </div>
+                <div class="grupo-formulario">
+                    <label>Código de Rastreamento:</label>
+                    <input v-model="novaEntregaForm.codigo_rastreamento" class="entrada-admin" required />
                 </div>
                 <div class="grupo-formulario">
                     <label>Data Estimada de Entrega:</label>
-                    <input type="date" v-model="novaEntregaForm.data" class="entrada-admin" required />
+                    <input type="date" v-model="novaEntregaForm.data_estimada" class="entrada-admin" required />
+                </div>
+                <div class="grupo-formulario">
+                    <label>Status Inicial:</label>
+                    <select v-model="novaEntregaForm.status" class="selecao-admin" required>
+                        <option value="em_preparo">Em Preparo</option>
+                        <option value="a_caminho">A Caminho</option>
+                        <option value="entregue">Entregue</option>
+                        <option value="atrasada">Atrasada</option>
+                    </select>
                 </div>
                 <button class="botao-admin">Criar Entrega</button>
                 </form>
@@ -252,7 +281,4 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
     <script src="../scripts/app_admin.js"></script>
 </body>
-<script>
-  console.log("Vue está carregado?", Vue);
-</script>
 </html>
