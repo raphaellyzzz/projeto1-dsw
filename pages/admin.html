@@ -122,6 +122,28 @@
                         <option v-for="cliente in listaClientes" :key="cliente.id" :value="cliente.cpfCnpj">{{ cliente.nome }} ({{ cliente.cpfCnpj }})</option>
                     </select>
                 </div>
+                <div class="grupo-formulario">
+                  <label>Peso (kg):</label>
+                  <input type="number" step="0.01" v-model="novaEncomendaForm.peso" class="entrada-admin" required />
+                </div>
+                <div class="grupo-formulario">
+                  <label>Tipo:</label>
+                  <select v-model="novaEncomendaForm.tipo" class="selecao-admin" required>
+                    <option value="">Selecione o tipo</option>
+                    <option value="documento">Documento</option>
+                    <option value="caixa">Caixa</option>
+                    <option value="palete">Palete</option>
+                  </select>
+                </div>
+                <div class="grupo-formulario">
+                  <label>Descrição:</label>
+                  <input v-model="novaEncomendaForm.descricao" class="entrada-admin" required />
+                </div>
+                <div class="grupo-formulario">
+                  <label>Endereço de Entrega:</label>
+                  <input v-model="novaEncomendaForm.endereco_entrega" class="entrada-admin" required />
+                </div>
+
                 <button class="botao-admin">Salvar Encomenda</button>
                 </form>
 
