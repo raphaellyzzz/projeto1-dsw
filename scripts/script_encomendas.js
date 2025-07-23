@@ -58,7 +58,8 @@ createApp({
         const res = await fetch(`${API_URL}/entregas`);
         if (!res.ok) throw new Error(`Erro ${res.status}`);
         const entregasBase = await res.json();
-
+        console.log('Entregas raw:', entregasBase);
+    
         const entregasComHistorico = await Promise.all(entregasBase.map(async entrega => {
           try {
             const historicoRes = await fetch(`${API_URL}/entregas/${entrega.id}/historico`);
@@ -73,7 +74,9 @@ createApp({
           }
           return entrega;
         }));
-
+    
+        console.log('Entregas com histórico:', entregasComHistorico);
+    
         this.entregas = entregasComHistorico;
       } catch (e) {
         console.error('Erro ao carregar entregas:', e);
