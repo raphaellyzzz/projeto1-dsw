@@ -38,6 +38,6 @@ A aplicação consome dados de uma API REST, enviada pelo professor, que fornece
 - Para melhorar a experiência, a aplicação exibe mensagens de carregamento enquanto busca os dados e mensagens amigáveis caso não encontre resultados.
 
 ## Autor
-@raphaellyzzz
+@ raphaellyzzz
 
 ---
