@@ -27,6 +27,7 @@ createApp({
 
         const condStatus = !filtroStatusLower || (entrega.status || '').toLowerCase() === filtroStatusLower;
 
+
         return condCodigo && condCliente && condStatus;
       });
     },
@@ -73,16 +74,16 @@ createApp({
       }
     },
     obterNomeCliente(id) {
-    const cliente = this.clientes.find(c => String(c.id) === String(id));
-    return cliente ? cliente.nome : 'Cliente não identificado';
+      const cliente = this.clientes.find(c => String(c.id) === String(id));
+      return cliente ? cliente.nome : `Cliente ${id}`;
     },
     obterOrigemRota(id) {
       const rota = this.rotas.find(r => String(r.id) === String(id));
       return rota ? rota.origem : 'N/A';
     },
-    obterOrigemRota(id) {
+    obterDestinoRota(id) {
       const rota = this.rotas.find(r => String(r.id) === String(id));
-      return rota ? rota.origem : 'Origem não disponível';
+      return rota ? rota.destino : 'N/A';
     },
     traduzirStatus(status) {
       const mapa = {
