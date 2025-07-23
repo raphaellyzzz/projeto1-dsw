@@ -4,13 +4,12 @@
   <meta charset="UTF-8" />
   <title>Página de Rastreamento</title>
   <link rel="stylesheet" href="../style.css" />
-  <link rel="icon" href="">
+  <link rel="icon" href="" />
 </head>
 <body>
- 
   <main class="rastreamento-principal" id="app-rastreamento">
     <a href="admin.html" class="botao-ir-adm">Ir para área administrativa</a> 
-    <br> <br>
+    <br /><br />
     <h1 id="titulo-rastreamento">Suas Encomendas:</h1>
 
     <div class="filtros-rastreamento">
@@ -29,25 +28,30 @@
       <div v-for="entrega in entregasFiltradas" :key="entrega.id" class="encomenda">
         <strong>Código:</strong> {{ entrega.codigo_rastreamento }} <br />
         <strong>Cliente:</strong> {{ obterNomeCliente(entrega.clienteId) }} <br />
-        <strong>Origem:</strong> {{ obterOrigemRota(entrega.rotaId) }} → <strong>Destino:</strong> {{ obterDestinoRota(entrega.rotaId) }}<br />
+        <strong>Origem:</strong> {{ obterOrigemRota(entrega.rotaId) }} → 
+        <strong>Destino:</strong> {{ obterDestinoRota(entrega.rotaId) }}<br />
         <strong>Status:</strong> {{ traduzirStatus(entrega.status) }} <br />
         <strong>Data Estimada:</strong> {{ formatarData(entrega.data_estimada) }}
-        
+
         <div class="historico" v-if="entrega.historico && entrega.historico.length">
-          <br>
+          <br />
           <h3 id="h3-rastreamento">Histórico:</h3>
           <ul>
             <li class="lista-rastreamento" v-for="h in entrega.historico" :key="h.data">
-              <strong>Na data:</strong> {{ formatarDataHora(h.data) }} - <strong>Status:</strong> {{ traduzirStatus(h.status) }} - <strong>Local:</strong> {{ h.local || 'N/A' }}
+              <strong>Na data:</strong> {{ formatarDataHora(h.data) }} - 
+              <strong>Status:</strong> {{ traduzirStatus(h.status) }} - 
+              <strong>Local:</strong> {{ h.local || 'N/A' }}
             </li>
           </ul>
         </div>
         <div class="historico" v-else><em>Sem histórico disponível</em></div>
-        <hr/>
+        <hr />
       </div>
+
       <div v-if="entregasFiltradas.length === 0 && !carregando" class="nenhuma-encomenda">
         Nenhuma encomenda encontrada com os filtros aplicados.
       </div>
+
       <div v-if="carregando" class="carregando-encomendas">
         Carregando encomendas...
       </div>
