@@ -14,6 +14,10 @@ createApp({
       filtroNomeCliente: '',
       filtroCpfCnpjCliente: '',
       novaEncomendaForm: {
+        peso: null,
+        tipo: '',
+        descricao: '',
+        endereco_entrega: '',
         codigo: '', conteudo: '', status: 'Pendente',
         dataPostagem: '', previsaoEntrega: '',
         remetenteCpfCnpj: '', destinatarioCpfCnpj: ''
@@ -31,13 +35,13 @@ createApp({
         tempo: ''
       },
       novaEntregaForm: {
-        clienteId: null, // Alterado para ID numérico
-        encomendaId: null, // Alterado para ID numérico
-        rotaId: '', // Mantido como string de ID
-        data_estimada: '', // Novo campo
-        status: 'em_preparo', // Novo campo com valor padrão
-        codigo_rastreamento: '', // Novo campo
-        historico: [] // Novo campo para histórico
+        clienteId: null, 
+        encomendaId: null,
+        rotaId: '', 
+        data_estimada: '', 
+        status: 'em_preparo', 
+        codigo_rastreamento: '',
+        historico: [] 
       },
       filtroStatusEncomenda: ''
     };
@@ -50,17 +54,26 @@ createApp({
       );
     },
     encomendasFiltradasC() {
-      const filtroCodigo = this.filtroCodigoEncomenda.toLowerCase();
-      const filtroStatus = this.filtroStatusEncomenda.toLowerCase();
-
+      const filtroTipo = this.filtroTipoEncomenda?.toLowerCase() || '';
+      const filtroPesoMin = this.filtroPesoMinEncomenda || null;
+      const filtroPesoMax = this.filtroPesoMaxEncomenda || null;
+    
       return this.listaEncomendas.filter(e => {
-        const condCodigo = !filtroCodigo || (
-          (e.codigo || '').toLowerCase().includes(filtroCodigo) ||
-          (e.descricao || '').toLowerCase().includes(filtroCodigo) ||
-          (e.conteudo || '').toLowerCase().includes(filtroCodigo)
-        );
-        const condStatus = !filtroStatus || (e.status || '').toLowerCase().includes(filtroStatus);
-        return condCodigo && condStatus;
+        let condTipo = true;
+        let condPeso = true;
+    
+        if (filtroTipo) {
+          condTipo = (e.tipo || '').toLowerCase().includes(filtroTipo);
+        }
+    
+        if (filtroPesoMin !== null) {
+          condPeso = condPeso && (parseFloat(e.peso) >= parseFloat(filtroPesoMin));
+        }
+        if (filtroPesoMax !== null) {
+          condPeso = condPeso && (parseFloat(e.peso) <= parseFloat(filtroPesoMax));
+        }
+    
+        return condTipo && condPeso;
       });
     }
   },
@@ -110,7 +123,7 @@ createApp({
         this.carregarEncomendas();
         this.carregarRotas();
         this.carregarEntregas();
-        this.carregarCentros(); // Adicionado para carregar centros no login
+        this.carregarCentros(); 
       } else {
         this.erroLogin = 'Usuário ou senha estão inválidos.';
       }
