@@ -37,7 +37,7 @@ A aplicação consome dados de uma API REST, enviada pelo professor, que fornece
 - A estrutura dos dados da API deve seguir o formato esperado para que as informações sejam exibidas corretamente.
 - Para melhorar a experiência, a aplicação exibe mensagens de carregamento enquanto busca os dados e mensagens amigáveis caso não encontre resultados.
 
-## Autor
-@ raphaellyzzz
+## Autora
+@raphaellyzzz
 
 ---
