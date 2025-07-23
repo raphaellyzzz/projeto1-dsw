@@ -15,87 +15,74 @@ createApp({
   },
   computed: {
     entregasFiltradas() {
-      const cod = this.filtroCodigo.toLowerCase();
-      const cliente = this.filtroCliente.toLowerCase();
-      const status = this.filtroStatus.toLowerCase();
+      const filtroCodigoLower = this.filtroCodigo.toLowerCase();
+      const filtroClienteLower = this.filtroCliente.toLowerCase();
+      const filtroStatusLower = this.filtroStatus.toLowerCase();
 
       return this.entregas.filter(entrega => {
-        const condCodigo = !cod || (entrega.codigo_rastreamento || '').toLowerCase().includes(cod);
+        const condCodigo = !filtroCodigoLower || (entrega.codigo_rastreamento || '').toLowerCase().includes(filtroCodigoLower);
         
-        const nomeCliente = (this.obterNomeCliente(entrega.clienteId || entrega.cliente) || '').toLowerCase();
-        const condCliente = !cliente || nomeCliente.includes(cliente);
+        const clienteNome = this.obterNomeCliente(entrega.clienteId || entrega.cliente).toLowerCase();
+        const condCliente = !filtroClienteLower || clienteNome.includes(filtroClienteLower);
 
-        const condStatus = !status || (entrega.status || '').toLowerCase() === status;
+        const condStatus = !filtroStatusLower || (entrega.status || '').toLowerCase() === filtroStatusLower;
 
         return condCodigo && condCliente && condStatus;
       });
-    }
+    },
   },
   methods: {
     async carregarClientes() {
       try {
         const res = await fetch(`${API_URL}/clientes`);
-        if (!res.ok) throw new Error(`Erro ${res.status}`);
         this.clientes = await res.json();
       } catch (e) {
         console.error('Erro ao carregar clientes:', e);
-        this.clientes = [];
       }
     },
     async carregarRotas() {
       try {
         const res = await fetch(`${API_URL}/rotas`);
-        if (!res.ok) throw new Error(`Erro ${res.status}`);
         this.rotas = await res.json();
       } catch (e) {
         console.error('Erro ao carregar rotas:', e);
-        this.rotas = [];
       }
     },
     async carregarEntregas() {
       this.carregando = true;
       try {
         const res = await fetch(`${API_URL}/entregas`);
-        if (!res.ok) throw new Error(`Erro ${res.status}`);
-        const entregasBase = await res.json();
-        console.log('Entregas raw:', entregasBase);
-    
-        const entregasComHistorico = await Promise.all(entregasBase.map(async entrega => {
+        let entregasData = await res.json();
+        
+        const entregasComHistorico = await Promise.all(entregasData.map(async entrega => {
           try {
             const historicoRes = await fetch(`${API_URL}/entregas/${entrega.id}/historico`);
-            if (historicoRes.ok) {
-              entrega.historico = await historicoRes.json();
-            } else {
-              entrega.historico = [];
-            }
+            entrega.historico = await historicoRes.json();
           } catch (e) {
-            console.warn(`Erro ao carregar histórico da entrega ${entrega.id}`, e);
-            entrega.historico = [];
+            console.warn(`Erro ao carregar histórico para entrega ${entrega.id}:`, e);
+            entrega.historico = []; 
           }
           return entrega;
         }));
-    
-        console.log('Entregas com histórico:', entregasComHistorico);
-    
+
         this.entregas = entregasComHistorico;
       } catch (e) {
         console.error('Erro ao carregar entregas:', e);
-        this.entregas = [];
       } finally {
         this.carregando = false;
       }
     },
     obterNomeCliente(id) {
-      const cliente = this.clientes.find(c => String(c.id) === String(id));
-      return cliente ? cliente.nome : 'Cliente não identificado';
+    const cliente = this.clientes.find(c => String(c.id) === String(id));
+    return cliente ? cliente.nome : 'Cliente não identificado';
+    },
+    obterOrigemRota(id) {
+      const rota = this.rotas.find(r => String(r.id) === String(id));
+      return rota ? rota.origem : 'N/A';
     },
     obterOrigemRota(id) {
       const rota = this.rotas.find(r => String(r.id) === String(id));
       return rota ? rota.origem : 'Origem não disponível';
-    },
-    obterDestinoRota(id) {
-      const rota = this.rotas.find(r => String(r.id) === String(id));
-      return rota ? rota.destino : 'Destino não disponível';
     },
     traduzirStatus(status) {
       const mapa = {
@@ -107,26 +94,32 @@ createApp({
         extraviada: 'Extraviada',
         atrasada: 'Atrasada',
       };
-      return mapa[status] || status || 'Desconhecido';
+      return mapa[status] || status || 'Status desconhecido';
     },
     formatarData(isoData) {
       if (!isoData) return 'N/A';
-      const d = new Date(isoData);
-      if (isNaN(d)) return isoData;
-      return d.toLocaleDateString('pt-BR');
+      const data = new Date(isoData);
+      if (isNaN(data)) return isoData;
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const ano = data.getFullYear();
+      return `${dia}/${mes}/${ano}`;
     },
     formatarDataHora(isoData) {
       if (!isoData) return 'N/A';
-      const d = new Date(isoData);
-      if (isNaN(d)) return isoData;
-      return d.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const data = new Date(isoData);
+      if (isNaN(data)) return isoData;
+      const dia = String(data.getDate()).padStart(2, '0');
+      const mes = String(data.getMonth() + 1).padStart(2, '0');
+      const ano = data.getFullYear();
+      const horas = String(data.getHours()).padStart(2, '0');
+      const minutos = String(data.getMinutes()).padStart(2, '0');
+      return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
     },
   },
   async mounted() {
-    await Promise.all([
-      this.carregarClientes(),
-      this.carregarRotas(),
-      this.carregarEntregas()
-    ]);
-  }
+    await this.carregarClientes();
+    await this.carregarRotas();
+    await this.carregarEntregas();
+  },
 }).mount('#app-rastreamento');
