@@ -10,7 +10,11 @@ createApp({
       erroLogin: '',
       secaoAtual: 'clientes',
       listaClientes: [],
-      novoClienteForm: { nome: '', cpfCnpj: '', email: '', endereco: '' },
+      novoClienteForm: { 
+        nome: '', 
+        cpfCnpj: '', 
+        email: '', 
+        endereco: '' },
       filtroNomeCliente: '',
       filtroCpfCnpjCliente: '',
       novaEncomendaForm: {
@@ -18,11 +22,11 @@ createApp({
         tipo: '',
         descricao: '',
         endereco_entrega: '',
-        codigo: '', conteudo: '', status: 'Pendente',
-        dataPostagem: '', previsaoEntrega: '',
-        remetenteCpfCnpj: '', destinatarioCpfCnpj: ''
       },
-      filtroCodigoEncomenda: '',
+      filtroTipoEncomenda: '',
+      filtroPesoMinEncomenda: '',
+      filtroPesoMaxEncomenda: '',
+
       listaRotas: [],
       listaEntregas: [],
       listaCentros: [],
@@ -43,7 +47,6 @@ createApp({
         codigo_rastreamento: '',
         historico: [] 
       },
-      filtroStatusEncomenda: ''
     };
   },
   computed: {
@@ -55,25 +58,26 @@ createApp({
     },
     encomendasFiltradasC() {
       const filtroTipo = this.filtroTipoEncomenda?.toLowerCase() || '';
-      const filtroPesoMin = this.filtroPesoMinEncomenda || null;
-      const filtroPesoMax = this.filtroPesoMaxEncomenda || null;
-    
+      const filtroPesoMin = parseFloat(this.filtroPesoMinEncomenda) || null;
+      const filtroPesoMax = parseFloat(this.filtroPesoMaxEncomenda) || null;
+
       return this.listaEncomendas.filter(e => {
-        let condTipo = true;
-        let condPeso = true;
-    
-        if (filtroTipo) {
-          condTipo = (e.tipo || '').toLowerCase().includes(filtroTipo);
-        }
-    
-        if (filtroPesoMin !== null) {
-          condPeso = condPeso && (parseFloat(e.peso) >= parseFloat(filtroPesoMin));
-        }
-        if (filtroPesoMax !== null) {
-          condPeso = condPeso && (parseFloat(e.peso) <= parseFloat(filtroPesoMax));
-        }
-    
-        return condTipo && condPeso;
+      let condTipo = true;
+      let condPeso = true;
+
+      if (filtroTipo) {
+        condTipo = (e.tipo || '').toLowerCase().includes(filtroTipo);
+      }
+
+      if (filtroPesoMin !== null) {
+        condPeso = condPeso && (parseFloat(e.peso) >= filtroPesoMin);
+      }
+
+      if (filtroPesoMax !== null) {
+        condPeso = condPeso && (parseFloat(e.peso) <= filtroPesoMax);
+      }
+
+      return condTipo && condPeso;
       });
     }
   },
@@ -175,8 +179,15 @@ createApp({
     },
 
     async adicionarEncomenda() {
-      const payload = { ...this.novaEncomendaForm };
-      console.log("Enviando encomenda:", payload); 
+      const payload = {
+        peso: parseFloat(this.novaEncomendaForm.peso), // Garante que o peso seja número
+        tipo: this.novaEncomendaForm.tipo,
+        descricao: this.novaEncomendaForm.descricao,
+        endereco_entrega: this.novaEncomendaForm.endereco_entrega,
+      };
+
+      console.log("Enviando encomenda:", payload);
+
       const res = await fetch(`${API_URL}/encomendas`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -185,17 +196,18 @@ createApp({
 
       if (res.ok) {
         this.novaEncomendaForm = {
-          codigo: '', conteudo: '', status: 'Pendente',
-          dataPostagem: '', previsaoEntrega: '',
-          remetenteCpfCnpj: '', destinatarioCpfCnpj: ''
+          peso: null,
+          tipo: '',
+          descricao: '',
+          endereco_entrega: '',
         };
         this.carregarEncomendas();
 
-      } else {
-        console.error('Erro ao adicionar encomenda:', res.statusText);
-      }
-    },
-
+        } else {
+          console.error('Erro ao adicionar encomenda:', res.statusText);
+        }
+      },
+      
     async carregarEntregas() {
       try {
         const response = await fetch(`${API_URL}/entregas`);
