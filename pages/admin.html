@@ -132,19 +132,30 @@
             </div>
 
             <div id="secao-rotas" class="secao-admin" v-show="secaoAtual === 'rotas'" v-cloak>
-                <h2>Rotas de Entrega</h2>
-                <form @submit.prevent="adicionarRota" class="formulario-admin">
+            <h2>Rotas de Entrega</h2>
+            <h3>Cadastrar Rota</h3>
+            <form @submit.prevent="adicionarRota" class="formulario-admin">
                 <div class="grupo-formulario">
                     <label>Origem:</label>
                     <input v-model="novaRotaForm.origem" class="entrada-admin" required />
                 </div>
+
                 <div class="grupo-formulario">
                     <label>Destino:</label>
-                    <input v-model="novaRotaForm.destino" class="entrada-admin" required />
+                    <select v-model="novaRotaForm.destino" class="entrada-admin" required>
+                        <option value="" disabled>Selecione o Destino</option>
+                        <option v-for="centro in listaCentros" :key="centro.id" :value="centro.nome">{{ centro.nome }}</option>
+                    </select>
                 </div>
+
                 <div class="grupo-formulario">
                     <label>Centros Intermediários (separar por vírgula):</label>
-                    <input v-model="novaRotaForm.centros" class="entrada-admin" />
+                    <input v-model="novaRotaForm.centros" class="entrada-admin" placeholder="Ex: Centro A, Centro B"/>
+                    <small>Centros disponíveis: 
+                        <span v-for="(centro, index) in listaCentros" :key="centro.id">
+                            {{ centro.nome }}{{ index < listaCentros.length - 1 ? ', ' : '' }}
+                        </span>
+                    </small>
                 </div>
                 <div class="grupo-formulario">
                     <label>Distância (km):</label>
@@ -155,34 +166,35 @@
                     <input type="number" v-model="novaRotaForm.tempo" class="entrada-admin" required />
                 </div>
                 <button class="botao-admin">Salvar Rota</button>
-                </form>
+            </form>
 
-                <h3>Listagem de Rotas</h3>
-                <div class="lista-admin">
-                <div v-for="rota in listaRotas" :key="rota.id" class="item-lista">
+            <h3>Listagem de Rotas</h3>
+            <div class="container-filtros">
+                <input v-model="filtroOrigemRota" placeholder="Filtrar por Origem" class="entrada-filtro-admin" />
+                <input v-model="filtroDestinoRota" placeholder="Filtrar por Destino" class="entrada-filtro-admin" />
+            </div>
+
+            <div class="lista-admin">
+                <div v-for="rota in rotasFiltradasC" :key="rota.id" class="item-lista">
                     <p class="p-admin-sem-espaco"><strong>Origem:</strong> {{ rota.origem }}</p>
                     <p class="p-admin-sem-espaco"><strong>Destino:</strong> {{ rota.destino }}</p>
                     <p class="p-admin-sem-espaco"><strong>Centros:</strong>
-                    <span v-if="rota.centros_intermediarios && rota.centros_intermediarios.length">
-                        {{ rota.centros_intermediarios.join(' → ') }}
-                    </span>
-                    <span v-else-if="rota.centros && rota.centros.length">
-                        {{ rota.centros.join(' → ') }}
-                    </span>
-                    <span v-else>
-                        Nenhum
-                    </span>
+                        <span v-if="rota.centros && rota.centros.length">
+                            {{ rota.centros.join(' → ') }}
+                        </span>
+                        <span v-else>
+                            Nenhum
+                        </span>
                     </p>
                     <p class="p-admin-sem-espaco"><strong>Distância:</strong> {{ rota.distancia_km || rota.distancia }} km</p>
                     <p class="p-admin-sem-espaco"><strong>Tempo Estimado:</strong> {{ rota.tempo_estimado_h || rota.tempo }} h</p>
                 </div>
-                </div>
             </div>
-
+        </div>
             <div id="secao-entregas" class="secao-admin" v-show="secaoAtual === 'entregas'" v-cloak>
-                <h2>Entregas</h2>
-                <h3>Criar Entrega</h3>
-                <form @submit.prevent="adicionarEntrega" class="formulario-admin">
+            <h2>Entregas</h2>
+            <h3>Criar Entrega</h3>
+            <form @submit.prevent="adicionarEntrega" class="formulario-admin">
                 <div class="grupo-formulario">
                     <label>Cliente:</label>
                     <select v-model.number="novaEntregaForm.clienteId" class="selecao-admin" required>
@@ -222,20 +234,39 @@
                     </select>
                 </div>
                 <button class="botao-admin">Criar Entrega</button>
-                </form>
+            </form>
 
-                <h3>Listagem de Entregas</h3>
-                <div class="lista-admin">
-                <div v-for="entrega in listaEntregas" :key="entrega.id" class="item-lista">
+            <h3>Listagem de Entregas</h3>
+            <div class="container-filtros">
+                <select v-model="filtroClienteEntrega" class="entrada-filtro-admin">
+                    <option value="" disabled selected>Filtrar por Cliente</option>
+                    <option v-for="cliente in listaClientes" :key="cliente.id" :value="cliente.id">{{ cliente.nome }}</option>
+                </select>
+                <select v-model="filtroRotaEntrega" class="entrada-filtro-admin">
+                    <option value="" disabled selected>Filtrar por Rota</option>
+                    <option v-for="rota in listaRotas" :key="rota.id" :value="rota.id">{{ rota.origem }} → {{ rota.destino }}</option>
+                </select>
+                <input type="date" v-model="filtroDataEntrega" placeholder="Filtrar por Data" class="entrada-filtro-admin" />
+                <select v-model="filtroStatusEntrega" class="entrada-filtro-admin">
+                    <option value="" disabled selected>Filtrar por Status</option>
+                    <option value="em_preparo">Em Preparo</option>
+                    <option value="a_caminho">A Caminho</option>
+                    <option value="entregue">Entregue</option>
+                    <option value="atrasada">Atrasada</option>
+                </select>
+            </div>
+
+            <div class="lista-admin">
+                <div v-for="entrega in entregasFiltradasC" :key="entrega.id" class="item-lista">
                     <strong>Cliente:</strong> {{ obterNomeCliente(entrega.clienteId || entrega.cliente) }}<br>
                     <strong>Encomenda:</strong> {{ obterCodigoEncomenda(entrega.encomendaId || entrega.encomenda) }}<br>
                     <strong>Rota:</strong> {{ obterDescricaoRota(entrega.rotaId || entrega.rota) }}<br>
                     <strong>Data Estimada:</strong> {{ formatarData(entrega.data_estimada || entrega.data) }}<br>
                     <strong>Status:</strong> {{ traduzirStatus(entrega.status) }}<br>
                 </div>
-                </div>
-                
             </div>
+        </div>
+
             <div id="secao-centros" class="secao-admin" v-show="secaoAtual === 'centros'" v-cloak>
             <h2>Centros de Distribuição</h2>
 
