@@ -11,6 +11,20 @@ A aplicação consome dados de uma API REST, enviada pelo professor, que fornece
 - **Histórico de movimentações:** Para cada entrega, mostra uma lista cronológica com data/hora, status e local das movimentações, facilitando o acompanhamento detalhado.
 
 ## Estrutura do Projeto
+
+```bash
+├── dados/
+├── pages/
+│   ├── admin.html
+│   └── rastreamento.html
+├── scripts/
+│   ├── app_admin.js
+│   └── script_encomendas.js
+├── db.json
+├── index.html
+├── README.md
+└── style.css
+```
 - **index.html:** Página simples de início com as opções de seguir para Administrador e Verificar as encomendas.
 - **admin.html:** Página Admin que tem login e permite cadastrar encomenda, cliente e rota. Bem como a visualização desses dados.
 - **app_admin.js:** Toda lógica com Vue da página admin. Metódos, Computed, etc
