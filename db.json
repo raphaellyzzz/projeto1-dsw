@@ -1,160 +1,34 @@
 {
   "clientes": [
     {
-      "id": "1",
+      "id": 1,
       "nome": "Empresa de Tecnologia LTDA",
       "cpfCnpj": "12345678000190",
       "email": "contato@tecnologia.com",
       "endereco": "Rua da Inovação, 123, Recife/PE"
     },
     {
-      "id": "2",
+      "id": 2,
       "nome": "Maria Silva",
       "cpfCnpj": "12345678901",
       "email": "maria.silva@email.com",
       "endereco": "Avenida Boa Viagem, 456, Recife/PE"
-    },
-    {
-      "id": "1b9e",
-      "nome": "adsdas",
-      "cpfCnpj": "1231",
-      "email": "dsadf",
-      "endereco": "dasdf"
-    },
-    {
-      "id": "0559",
-      "nome": "dasdas",
-      "cpfCnpj": "44564d",
-      "email": "teste",
-      "endereco": "dsadas"
-    },
-    {
-      "id": "1924",
-      "nome": "dsadas",
-      "cpfCnpj": "5645",
-      "email": "dsadas",
-      "endereco": "dasdas"
-    },
-    {
-      "id": "18a1",
-      "nome": "dsadsa",
-      "cpfCnpj": "56421",
-      "email": "dsadas",
-      "endereco": "dsadas"
-    },
-    {
-      "id": "e6d4",
-      "nome": "dadsd",
-      "cpfCnpj": "456465ds",
-      "email": "sadsad",
-      "endereco": "dadasds"
-    },
-    {
-      "id": "8968",
-      "nome": "adsd",
-      "cpfCnpj": "5645",
-      "email": "dsadas",
-      "endereco": "dsadas"
-    },
-    {
-      "id": "5ace",
-      "nome": "dasdasd",
-      "cpfCnpj": "45645",
-      "email": "dsadsa",
-      "endereco": "ddasdas"
-    },
-    {
-      "id": "0828",
-      "nome": "vamos la",
-      "cpfCnpj": "5648",
-      "email": "dsadsa",
-      "endereco": "sdadas"
-    },
-    {
-      "id": "6763",
-      "nome": "dsadas",
-      "cpfCnpj": "564",
-      "email": "dsadas",
-      "endereco": "dsadas"
-    },
-    {
-      "id": "a5df",
-      "nome": "dsad",
-      "cpfCnpj": "15616",
-      "email": "dasdas",
-      "endereco": "dadsads"
-    },
-    {
-      "id": "73cb",
-      "nome": "TESTE",
-      "cpfCnpj": "123455",
-      "email": "dsadasd",
-      "endereco": "dsadsad"
     }
   ],
   "encomendas": [
     {
-      "id": "101",
+      "id": 101,
       "peso": 5.5,
       "tipo": "caixa",
       "descricao": "Peças de computador",
       "endereco_entrega": "Rua do Futuro, 789, Olinda/PE"
     },
     {
-      "id": "102",
+      "id": 102,
       "peso": 0.2,
       "tipo": "documento",
       "descricao": "Contrato confidencial",
       "endereco_entrega": "Rua da Aurora, 101, Recife/PE"
-    },
-    {
-      "id": "68b6",
-      "peso": 5456,
-      "tipo": "documento",
-      "descricao": "dasdsa",
-      "endereco_entrega": "dasdasd"
-    },
-    {
-      "id": "79d0",
-      "peso": 4564,
-      "tipo": "caixa",
-      "descricao": "dsadsa",
-      "endereco_entrega": "dasds"
-    },
-    {
-      "id": "1b9a",
-      "peso": 456,
-      "tipo": "documento",
-      "descricao": "dsad",
-      "endereco_entrega": "sadasd"
-    },
-    {
-      "id": "2efb",
-      "peso": 5,
-      "tipo": "documento",
-      "descricao": "dasdsad",
-      "endereco_entrega": "dsadasd"
-    },
-    {
-      "id": "b285",
-      "peso": 454,
-      "tipo": "caixa",
-      "descricao": "dsdsads",
-      "endereco_entrega": "sdsadsadsa"
-    },
-    {
-      "id": "db37",
-      "peso": 546,
-      "tipo": "caixa",
-      "descricao": "dsadas",
-      "endereco_entrega": "dasdas"
-    },
-    {
-      "id": "2e90",
-      "peso": 564,
-      "tipo": "caixa",
-      "descricao": "sdadas",
-      "endereco_entrega": "dsadasd"
     }
   ],
   "centros": [
@@ -208,38 +82,6 @@
           "data": "2025-07-11T14:30:00Z",
           "status": "a_caminho",
           "local": "Em trânsito para Caruaru"
-        }
-      ]
-    },
-    {
-      "id": "ac0b",
-      "clienteId": 2,
-      "encomendaId": 101,
-      "rotaId": "rota-01",
-      "codigo_rastreamento": "4654",
-      "data_estimada": "5648-04-15",
-      "status": "em_preparo",
-      "historico": [
-        {
-          "data": "2025-07-24T18:16:16.393Z",
-          "status": "em_preparo",
-          "local": "Entrega criada"
-        }
-      ]
-    },
-    {
-      "id": "8938",
-      "clienteId": 2,
-      "encomendaId": 102,
-      "rotaId": "rota-01",
-      "codigo_rastreamento": "4564",
-      "data_estimada": "2154-12-15",
-      "status": "em_preparo",
-      "historico": [
-        {
-          "data": "2025-07-24T18:17:01.472Z",
-          "status": "em_preparo",
-          "local": "Entrega criada"
         }
       ]
     }
