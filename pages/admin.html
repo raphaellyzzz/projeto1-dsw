@@ -9,6 +9,7 @@
 <body>
     <main class="principal-adm">
         <section id="secao-login" class="area-login" v-show="!logado">
+            <a href="rastreamento.html" class="botao-ir-adm">Ir para área de rastreamento</a> 
             <h1>Login - Área Administrativa</h1>
             <form @submit.prevent="realizarLogin" class="formulario-login">
                 <div class="grupo-formulario">
@@ -80,102 +81,54 @@
             </div>
 
             <div id="secao-encomendas" class="secao-admin" v-show="secaoAtual === 'encomendas'" v-cloak>
-                <h2>Encomendas</h2>
-                <h3>Cadastrar Encomenda</h3>
-                <form @submit.prevent="adicionarEncomenda" class="formulario-admin">
+            <h2>Encomendas</h2>
+            <h3>Cadastrar Encomenda</h3>
+            <form @submit.prevent="adicionarEncomenda" class="formulario-admin">
                 <div class="grupo-formulario">
-                    <label>Código de Rastreamento:</label>
-                    <input v-model="novaEncomendaForm.codigo" class="entrada-admin" required />
+                    <label>Peso (kg):</label>
+                    <input type="number" step="0.01" v-model="novaEncomendaForm.peso" class="entrada-admin" required />
                 </div>
                 <div class="grupo-formulario">
-                    <label>Conteúdo:</label>
-                    <input v-model="novaEncomendaForm.conteudo" class="entrada-admin" required />
-                </div>
-                <div class="grupo-formulario">
-                    <label>Status:</label>
-                    <select v-model="novaEncomendaForm.status" class="selecao-admin" required>
-                    <option value="Pendente">Pendente</option>
-                    <option value="Em Trânsito">Em Trânsito</option>
-                    <option value="Entregue">Entregue</option>
-                    <option value="Extraviada">Extraviada</option>
+                    <label>Tipo:</label>
+                    <select v-model="novaEncomendaForm.tipo" class="selecao-admin" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="documento">Documento</option>
+                        <option value="caixa">Caixa</option>
+                        <option value="palete">Palete</option>
                     </select>
                 </div>
                 <div class="grupo-formulario">
-                    <label>Data de Postagem:</label>
-                    <input type="date" v-model="novaEncomendaForm.dataPostagem" class="entrada-admin" required />
+                    <label>Descrição:</label>
+                    <input v-model="novaEncomendaForm.descricao" class="entrada-admin" required />
                 </div>
                 <div class="grupo-formulario">
-                    <label>Previsão de Entrega:</label>
-                    <input type="date" v-model="novaEncomendaForm.previsaoEntrega" class="entrada-admin" required />
+                    <label>Endereço de Entrega:</label>
+                    <input v-model="novaEncomendaForm.endereco_entrega" class="entrada-admin" required />
                 </div>
-                <div class="grupo-formulario">
-                    <label>Remetente (Cliente):</label>
-                    <select v-model="novaEncomendaForm.remetenteCpfCnpj" class="selecao-admin" required>
-                        <option value="">Selecione um cliente</option>
-                        <option v-for="cliente in listaClientes" :key="cliente.id" :value="cliente.cpfCnpj">{{ cliente.nome }} ({{ cliente.cpfCnpj }})</option>
-                    </select>
-                </div>
-                <div class="grupo-formulario">
-                    <label>Destinatário (Cliente):</label>
-                    <select v-model="novaEncomendaForm.destinatarioCpfCnpj" class="selecao-admin" required>
-                        <option value="">Selecione um cliente</option>
-                        <option v-for="cliente in listaClientes" :key="cliente.id" :value="cliente.cpfCnpj">{{ cliente.nome }} ({{ cliente.cpfCnpj }})</option>
-                    </select>
-                </div>
-                <div class="grupo-formulario">
-                  <label>Peso (kg):</label>
-                  <input type="number" step="0.01" v-model="novaEncomendaForm.peso" class="entrada-admin" required />
-                </div>
-                <div class="grupo-formulario">
-                  <label>Tipo:</label>
-                  <select v-model="novaEncomendaForm.tipo" class="selecao-admin" required>
-                    <option value="">Selecione o tipo</option>
-                    <option value="documento">Documento</option>
-                    <option value="caixa">Caixa</option>
-                    <option value="palete">Palete</option>
-                  </select>
-                </div>
-                <div class="grupo-formulario">
-                  <label>Descrição:</label>
-                  <input v-model="novaEncomendaForm.descricao" class="entrada-admin" required />
-                </div>
-                <div class="grupo-formulario">
-                  <label>Endereço de Entrega:</label>
-                  <input v-model="novaEncomendaForm.endereco_entrega" class="entrada-admin" required />
-                </div>
-
-                <button class="botao-admin">Salvar Encomenda</button>
+                <button class="botao-admin" type="submit">Salvar Encomenda</button>
                 </form>
 
                 <h3>Listagem de Encomendas</h3>
                 <div class="container-filtros">
-                <input v-model="filtroCodigoEncomenda" placeholder="Filtrar por Código" class="entrada-filtro-admin" />
-                <input v-model="filtroStatusEncomenda" placeholder="Filtrar por Status" class="entrada-filtro-admin" />
+                    <select v-model="filtroTipoEncomenda" class="entrada-filtro-admin">
+                        <option value="" disabled selected>Filtrar por Tipo</option>
+                        <option value="documento">Documento</option>
+                        <option value="caixa">Caixa</option>
+                        <option value="palete">Palete</option>
+                    </select>
+                    <input type="number" step="0.01" v-model="filtroPesoMinEncomenda" placeholder="Peso Mínimo (kg)" class="entrada-filtro-admin" />
+                    <input type="number" step="0.01" v-model="filtroPesoMaxEncomenda" placeholder="Peso Máximo (kg)" class="entrada-filtro-admin" />
                 </div>
 
-               <div class="lista-admin" >
+                <div class="lista-admin" >
                     <div v-for="encomenda in encomendasFiltradasC" :key="encomenda.id" class="item-lista">
                         <strong>ID:</strong> {{ encomenda.id }}<br>
-
-                        <template v-if="encomenda.codigo">
-                        <strong>Código:</strong> {{ encomenda.codigo }}<br>
-                        <strong>Conteúdo:</strong> {{ encomenda.conteudo }}<br>
-                        <strong>Status:</strong> {{ encomenda.status }}<br>
-                        <strong>Data de Postagem:</strong> {{ encomenda.dataPostagem }}<br>
-                        <strong>Previsão de Entrega:</strong> {{ encomenda.previsaoEntrega }}<br>
-                        <strong>Remetente:</strong> {{ encomenda.remetenteCpfCnpj }}<br>
-                        <strong>Destinatário:</strong> {{ encomenda.destinatarioCpfCnpj }}<br>
-                        </template>
-
-                        <template v-else>
                         <strong>Descrição:</strong> {{ encomenda.descricao }}<br>
                         <strong>Peso:</strong> {{ encomenda.peso }} kg<br>
                         <strong>Tipo:</strong> {{ encomenda.tipo }}<br>
                         <strong>Endereço de Entrega:</strong> {{ encomenda.endereco_entrega }}<br>
-                        </template>
                     </div>
                 </div>
-
             </div>
 
             <div id="secao-rotas" class="secao-admin" v-show="secaoAtual === 'rotas'" v-cloak>

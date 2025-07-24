@@ -1,5 +1,11 @@
 const { createApp } = Vue;
+
 const API_URL = 'http://200.133.17.234:5000';
+
+// 'http://200.133.17.234:5000' fora do IF
+// 'http://172.16.36.31:5000' dentro do IF
+
+console.log(`[script_encomendas.js] usando API: ${API_URL}`);
 
 createApp({
   data() {
@@ -21,8 +27,8 @@ createApp({
 
       return this.entregas.filter(entrega => {
         const condCodigo = !filtroCodigoLower || (entrega.codigo_rastreamento || '').toLowerCase().includes(filtroCodigoLower);
-        
-        const clienteNome = this.obterNomeCliente(entrega.clienteId || entrega.cliente).toLowerCase();
+
+        const clienteNome = (entrega.clienteId ? this.obterNomeCliente(entrega.clienteId) : (entrega.cliente ? this.obterNomeCliente(entrega.cliente) : '')).toLowerCase();
         const condCliente = !filtroClienteLower || clienteNome.includes(filtroClienteLower);
 
         const condStatus = !filtroStatusLower || (entrega.status || '').toLowerCase() === filtroStatusLower;
@@ -53,20 +59,7 @@ createApp({
       this.carregando = true;
       try {
         const res = await fetch(`${API_URL}/entregas`);
-        let entregasData = await res.json();
-        
-        const entregasComHistorico = await Promise.all(entregasData.map(async entrega => {
-          try {
-            const historicoRes = await fetch(`${API_URL}/entregas/${entrega.id}/historico`);
-            entrega.historico = await historicoRes.json();
-          } catch (e) {
-            console.warn(`Erro ao carregar histórico para entrega ${entrega.id}:`, e);
-            entrega.historico = []; 
-          }
-          return entrega;
-        }));
-
-        this.entregas = entregasComHistorico;
+        this.entregas = await res.json();
       } catch (e) {
         console.error('Erro ao carregar entregas:', e);
       } finally {
